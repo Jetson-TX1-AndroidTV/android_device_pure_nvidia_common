@@ -15,21 +15,20 @@
 #
 
 # Overlay
-ifneq ($(TARGET_TEGRA_DISABLE_OVERLAY),true)
-    DEVICE_PACKAGE_OVERLAYS += \
-         device/nvidia/shield-common/overlay/common
-
-    ifeq ($(PRODUCT_IS_ATV),true)
-        DEVICE_PACKAGE_OVERLAYS += \
-            device/nvidia/shield-common/overlay/tv
-    else
-        DEVICE_PACKAGE_OVERLAYS += \
-            device/nvidia/shield-common/overlay/tablet-do
-    endif
-endif
+#ifneq ($(TARGET_TEGRA_DISABLE_OVERLAY),true)
+#    DEVICE_PACKAGE_OVERLAYS += \
+#         device/nvidia/shield-common/overlay/common
+#    else
+#        DEVICE_PACKAGE_OVERLAYS += \
+#            device/nvidia/shield-common/overlay/tablet-do
+#endif
 
 # System properties
 -include $(LOCAL_PATH)/system_prop.mk
+
+# For android_filesystem_config.h
+PRODUCT_PACKAGES += fs_config_files \
+                    fs_config_dirs
 
 # Ramdisk
 PRODUCT_PACKAGES += \
@@ -196,3 +195,8 @@ NV_ANDROID_FRAMEWORK_ENHANCEMENTS := TRUE
 
 # Only set if framework modifications for blakepairing are available.
 NV_ANDROID_FRAMEWORK_ENHANCEMENTS_BLAKE := FALSE
+
+ADDITIONAL_DEFAULT_PROPERTIES += \
+    ro.adb.secure=0 \
+    ro.secure=0 \
+    ro.debuggable=1

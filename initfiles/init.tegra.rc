@@ -1,4 +1,4 @@
-#Copyright (c) 2011-2015 NVIDIA Corporation.  All Rights Reserved.
+#Copyright (c) 2011-2018 NVIDIA Corporation.  All Rights Reserved.
 #
 #NVIDIA Corporation and its licensors retain all intellectual property and
 #proprietary rights in and to this software and related documentation.  Any
@@ -36,11 +36,21 @@ on init
     # create directory for mounting user calibration partition
     mkdir /usercalib 0771 system system
 
+on early-boot
+    # Update dm-verity state and set partition.*.verified properties
+    verity_update_state
+
 on fs
 # mount console ramooops
    mount pstore pstore /sys/fs/pstore
 
 on post-fs-data
+    # Now that are booted all the way and out of mount panics, ensure that we panic on later errors.
+    # This is a hack to work around the fact that we can't recover from all errors that would lead to a panic
+    # during the initial mount (http://b/17382778), yet we need to panic on emmc errors (http://b/17640053)
+    # For a remount only the flags and the target mount point are relevant.
+    mount dummy dummy /data remount nosuid nodev noatime rw seclabel,background_gc=on,user_xattr,acl,errors=panic
+
     # We chown/chmod /usercalib again so because mount is run as root + defaults
     chown system system /usercalib
     chmod 0771 /usercalib
